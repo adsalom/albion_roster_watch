@@ -1,0 +1,9 @@
+{
+  "name": "albion-roster-watch",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "albion_roster_watch.js",
+  "scripts": {
+    "start": "node albion_roster_watch.js"
+  }
+}
