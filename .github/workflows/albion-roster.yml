@@ -1,0 +1,42 @@
+name: Albion Roster Watch
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # cada 15 minutos (horario UTC)
+  workflow_dispatch:         # permite ejecutarlo a mano desde la pestaña Actions
+  push:
+    paths:
+      - "albion_roster_watch.js"
+      - "package.json"
+      - ".github/workflows/albion-roster.yml"
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    # evita solapes si una ejecución tarda más que el intervalo
+    concurrency:
+      group: albion-roster
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install deps
+        run: npm install
+
+      - name: Run watcher
+        env:
+          WEBHOOK: ${{ secrets.WEBHOOK }}
+          GUILD_ID: ${{ secrets.GUILD_ID }}
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+          REDIS_KEY: ${{ secrets.REDIS_KEY }}
+        run: node albion_roster_watch.js
